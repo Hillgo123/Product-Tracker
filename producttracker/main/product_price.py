@@ -1,4 +1,5 @@
 from django.core.mail import send_mail
+from django.conf import settings
 from bs4 import BeautifulSoup
 import requests
 import os
@@ -26,11 +27,10 @@ def get_price(link: str):
 
 def update_price(product):
     if product.price != 0:
-        print(product.author.email)
         send_mail(
-            'Price update',
+            f'Price update of {product.name}',
             f'The price of {product.name} has changed to {get_price(product.link)} :- from {product.price} :-',
-            os.environ.get('EMAIL'),
+            settings.EMAIL_HOST_USER,
             [product.author.email],
             fail_silently=False,
         )
@@ -38,7 +38,6 @@ def update_price(product):
 
         product.price = get_price(product.link)
         product.save()
-        print(f'Updated {product.name} to {product.price}')
 
 
 if __name__ == '__main__':
