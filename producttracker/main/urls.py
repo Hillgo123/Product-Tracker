@@ -6,4 +6,6 @@ urlpatterns = [
     path('index', views.home, name='index'),
     path('sign-up', views.signup, name='sign-up'),
     path('create-product', views.create_product, name='create-product'),
+    path('track_product/<int:product_id>/', views.track_product, name='track_product'),
+    path('user_profile/<str:username>/', views.user_profile, name='user_profile'),
 ]
