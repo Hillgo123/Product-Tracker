@@ -58,3 +58,8 @@ class PasswordChangeForm(SetPasswordForm):
             ('new_password1', self.fields['new_password1']),
             ('new_password2', self.fields['new_password2']),
         ])
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    subject = forms.CharField(max_length=200)
+    message = forms.CharField(widget=forms.Textarea)

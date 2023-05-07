@@ -1,13 +1,17 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
-from .forms import SignUpForm, ProductForm, UserChangeForm, PasswordChangeForm
+from .forms import ContactForm, SignUpForm, ProductForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .models import Product, ProductTracking
 from .product_price import get_price, update_price
 from django.contrib.auth.models import User
-from urllib.parse import urlparse, urlunparse
+from django.core.mail import send_mail
+from django.conf import settings
 from django.urls import reverse
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Create your views here.
 
@@ -144,3 +148,30 @@ def edit_profile(request: object):
 
 
     return render(request, 'main/edit_profile.html', context)
+
+def about(request: object):
+    return render(request, 'main/about.html')
+
+@login_required(login_url='/login')
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message = f"Message from {form.cleaned_data['name']}):\n\n{form.cleaned_data['message']}"
+            send_mail(
+                subject, 
+                message, 
+                settings.EMAIL_HOST_USER, 
+                [request.user.email], 
+                fail_silently=False
+            )
+            print(request.user.email)
+            return HttpResponseRedirect(reverse('contact_success'))
+    else:
+        form = ContactForm()
+
+    return render(request, 'main/contact.html', {'form': form})
+
+def contact_success(request):
+    return render(request, 'main/contact_success.html')

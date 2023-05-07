@@ -402,3 +402,11 @@ footer {
 #sign-out {
     margin: 5vh 0;
 }
+
+/* About */
+
+.about {
+    position: relative;
+    top: 30vh;
+    transform: translateY(-50%);
+}
