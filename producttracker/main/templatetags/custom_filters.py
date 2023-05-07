@@ -12,3 +12,7 @@ def is_tracking(product, user):
     
     except ObjectDoesNotExist:
         return False
+    
+@register.filter(name='equalto')
+def equalto(value, arg):
+    return value == arg

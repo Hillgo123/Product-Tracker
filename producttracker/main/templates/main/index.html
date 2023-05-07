@@ -5,9 +5,20 @@ Home
 {% endblock %}
 {% block content %}
 
+<div class="form-group">
+    <label for="sort_by">Sort by:</label>
+    <select id="sort_by" class="form-control" onchange="location = this.value;">
+        <option value="?sort_by=date_added" {% if request.GET.sort_by|equalto:"date_added" %}selected{% endif %}>Date
+            Added</option>
+        <option value="?sort_by=name" {% if request.GET.sort_by|equalto:"name" %}selected{% endif %}>Name</option>
+        <option value="?sort_by=price" {% if request.GET.sort_by|equalto:"price" %}selected{% endif %}>Price</option>
+    </select>
+</div>
+
 {% for product in products %}
 <div class="card mt-2">
-    <div class="card-header"><strong>Created by @{{ product.author.username }}</strong></div>
+    <div class="card-header"><strong>Created by @<a href="{% url 'user_profile' username=product.author.username %}"
+                class="link">{{product.author.username}}</a></strong></div>
     <div class="card-body d-flex flex-row justify-content-between">
         <div>
             <h5 class="card-title"><b>{{product.name}}</b></h5>
@@ -41,6 +52,9 @@ Home
                     Delete
                 </button>
             </form>
+
+            <a href="{% url 'edit_product' product.id %}" class="btn btn-secondary">Edit</a>
+
             {% endif %}
         </div>
     </div>

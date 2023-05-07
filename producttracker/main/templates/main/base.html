@@ -31,6 +31,9 @@
                     <span class="navbar-text"><a href="{% url 'user_profile' username=user.username %}">
                             {{ user.username }}</a> | </span>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile | </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/logout">Logout</a>
                     </li>
                     {% else %}

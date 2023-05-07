@@ -1,5 +1,6 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
-from .forms import SignUpForm, ProductForm
+from .forms import SignUpForm, ProductForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .models import Product, ProductTracking
@@ -12,7 +13,15 @@ from django.urls import reverse
 
 @login_required(login_url='/login')
 def home(request: object):
-    products = Product.objects.all().order_by('-date_added')
+    products = Product.objects.all()
+    
+    sort_by = request.GET.get("sort_by", "date_added")
+    if sort_by == "name":
+        products = products.order_by("name")
+    elif sort_by == "price":
+        products = products.order_by("price")
+    else:  # Default sorting: date_added
+        products = products.order_by("-date_added")
 
     if request.method == 'POST':
         product_id = request.POST.get('product-id')
@@ -87,3 +96,51 @@ def user_profile(request: object, username: str):
     }
 
     return render(request, 'main/user_profile.html', context)
+
+@login_required(login_url='/login')
+def edit_product(request: object, product_id: int):
+    product = get_object_or_404(Product, pk=product_id)
+    
+    if request.user != product.author:
+        return HttpResponseRedirect(reverse('home'))
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('user_profile', args=[request.user.username]))
+    else:
+        form = ProductForm(instance=product)
+
+    context = {
+        'form': form,
+        'product': product,
+    }
+
+    return render(request, 'main/edit_product.html', context)
+
+@login_required(login_url='/login')
+def edit_profile(request: object):
+    if request.method == 'POST':
+        form = UserChangeForm(request.POST, instance=request.user)
+
+        if 'delete_account' in request.POST:
+            request.user.delete()
+            return HttpResponseRedirect(reverse('home'))
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('user_profile', args=[request.user.username]))
+        
+    else:
+        form = UserChangeForm(instance=request.user)
+    
+    password_change_form = PasswordChangeForm(request.user)
+
+    context = {
+        'form': form,
+        'password_change_form': password_change_form,
+    }
+
+
+    return render(request, 'main/edit_profile.html', context)
