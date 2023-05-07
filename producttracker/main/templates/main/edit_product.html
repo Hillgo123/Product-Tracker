@@ -5,9 +5,9 @@ Edit Product - {{ product.name }}
 {% load crispy_forms_tags %}{% block content %}
 
 <h2>Edit Product</h2>
-<form method="POST">
+<form method="POST" class="form">
     {% csrf_token %}{{form|crispy}}
-    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <button type="submit" class="btn btn-success">Create Product</button>
 </form>
 
 {% endblock %}

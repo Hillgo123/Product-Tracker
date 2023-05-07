@@ -6,52 +6,67 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{%block title%}Base{%endblock%}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extrahead %}{% endblock %}
 
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <div>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/index">Home</a>
-                    </li>
-                    <span class="navbar-text"> | </span>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/create-product">New Product</a>
-                    </li>
-                </ul>
+    <nav class="fixed-nav-bar">
+        <a href="/index">
+            <div class="logo"><span>Product</span>Tracker</div>
+        </a>
+        <input type="checkbox" id="menuButton" />
+        <label for="menuButton" class="menu-button-label">
+            <div class="white-bar"></div>
+            <div class="white-bar"></div>
+            <div class="white-bar"></div>
+            <div class="white-bar"></div>
+        </label>
+    </nav>
+
+    <div class="the-bass">
+        <div class="rela-block drop-down-container">
+            {% if user.is_authenticated %}
+            <div class="drop-down-item">
+                <button onclick="update_site_location('{% url 'user_profile' username=user.username %}')">
+                    {{ user.username }}</button>
             </div>
-            <div>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                    <span class="navbar-text"><a href="{% url 'user_profile' username=user.username %}">
-                            {{ user.username }}</a> | </span>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile | </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
-                    {% endif %}
-                </ul>
+            {% else %}
+            <div class="drop-down-item">
+                <button onclick="update_site_location('/login')">Login</button>
+            </div>
+            {% endif %}
+        </div>
+        <div class="rela-block drop-down-container">
+            <div class="drop-down-item">
+                <button onclick="update_site_location('/create-product')">New Product</button>
             </div>
         </div>
-    </nav>
-    <div class="container">
+        <div class="rela-block drop-down-container">
+            <div class="drop-down-item">
+                <button onclick="update_site_location('pages/about.html')">About</button>
+            </div>
+        </div>
+        <div class="rela-block drop-down-container">
+            <div class="drop-down-item">
+                <button onclick="update_site_location('pages/contact.html')">Contact</button>
+            </div>
+        </div>
+        <div class="rela-block drop-down-container">
+            <div class="drop-down-item">
+                <button onclick="update_site_location('/edit_profile')">Settings</button>
+            </div>
+        </div>
+    </div>
+    <div class="content">
         {% block content %}{% endblock %}
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
+    <footer>
+        <p>&copy; 2022 Price Tracker. All Rights Reserved.</p>
+    </footer>
+    <script src="{% static 'scripts/index.js' %}"></script>
 </body>
 
 </html>

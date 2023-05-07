@@ -14,13 +14,13 @@ from django.urls import reverse
 @login_required(login_url='/login')
 def home(request: object):
     products = Product.objects.all()
-    
+
     sort_by = request.GET.get("sort_by", "date_added")
     if sort_by == "name":
         products = products.order_by("name")
     elif sort_by == "price":
         products = products.order_by("price")
-    else:  # Default sorting: date_added
+    else:
         products = products.order_by("-date_added")
 
     if request.method == 'POST':

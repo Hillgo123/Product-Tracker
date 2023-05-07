@@ -2,7 +2,8 @@
 {% block title %}Create a Product{% endblock %}
 {% load crispy_forms_tags %} {% block content %}
 
-<form method="post">
+<h2>Create a Product</h2>
+<form method="post" class="form">
     {% csrf_token %}{{form|crispy}}
     <button type="submit" class="btn btn-success">Create Product</button>
 </form>

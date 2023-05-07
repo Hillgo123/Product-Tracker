@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -37,6 +38,23 @@ class UserChangeForm(UserChangeForm):
         fields = ['username', 'email']
 
 class PasswordChangeForm(SetPasswordForm):
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'autocomplete': 'off'}))
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'autocomplete': 'off'}))
-    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'autocomplete': 'off'}))
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'autocomplete': 'off'}),
+        label="Old password"
+    )
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'autocomplete': 'off'}),
+        label="New password"
+    )
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'autocomplete': 'off'}),
+        label="Confirm new password"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields = OrderedDict([
+            ('old_password', self.fields['old_password']),
+            ('new_password1', self.fields['new_password1']),
+            ('new_password2', self.fields['new_password2']),
+        ])
