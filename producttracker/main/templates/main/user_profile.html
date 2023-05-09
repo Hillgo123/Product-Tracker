@@ -5,7 +5,7 @@ User Profile - {{ user_profile.username }}
 {% endblock %}
 {% block content %}
 
-<h2>Products Posted by {{ user_profile.username }}</h2>
+<h2>Products Posted by @{{ user_profile.username }}</h2>
 {% for product in posted_products %}
 <div class="card">
     <div class="card-header">Created by <a href="{% url 'user_profile' username=product.author.username %}"
@@ -21,7 +21,7 @@ User Profile - {{ user_profile.username }}
                 <p>N/A</p>
                 {% else %}
                 <p>{{product.price}} :-</p>
-                <a href="{{product.link}}">Product</a>
+                <a href="{{product.link}}">Product link</a>
                 {% endif %}
             </div>
             <div class="actions">
@@ -60,7 +60,7 @@ User Profile - {{ user_profile.username }}
         <div class="card-footer">Posted {{product.date_added}}</div>
     </div>
     {% empty %}
-    <p>No products posted yet.</p>
+    <p class="empty">No products posted yet.</p>
     {% endfor %}
 
     <h2>Tracked Products</h2>
@@ -79,7 +79,7 @@ User Profile - {{ user_profile.username }}
                     <p>N/A</p>
                     {% else %}
                     <p>{{product.price}} :-</p>
-                    <a href="{{product.link}}">Product</a>
+                    <a href="{{product.link}}">Product link</a>
                     {% endif %}
                 </div>
                 <div class="actions">
@@ -119,7 +119,7 @@ User Profile - {{ user_profile.username }}
             <div class="card-footer">Posted {{product.date_added}}</div>
         </div>
         {% empty %}
-        <p>No products tracked yet.</p>
+        <p class="empty">No products tracked yet.</p>
         {% endfor %}
 
         {% endblock %}

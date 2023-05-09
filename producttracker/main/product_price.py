@@ -1,9 +1,8 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
-from django.conf import settings
 from bs4 import BeautifulSoup
 import requests
-import os
 import re
 
 
@@ -12,6 +11,8 @@ headers = {
 
 
 def price_to_float(price: str):
+    """Converts a price string to a float"""
+
     numbers = re.findall(r'\d+', price)
     if numbers:
         return float(''.join(numbers))
@@ -19,6 +20,8 @@ def price_to_float(price: str):
         return 0
 
 def get_price(link: str):
+        """Returns the price of a product from a link"""
+        
         soup = BeautifulSoup(requests.get(link, headers=headers).text, 'html.parser')
         try:
             if link.startswith('https://www.netonnet.se'):
@@ -35,6 +38,7 @@ def get_price(link: str):
             return 0
 
 def update_price(product):
+    print('Updating price...')
     if product.price != get_price(product.link):
         tracking_users = User.objects.filter(producttracking__product=product)
 
@@ -52,4 +56,4 @@ def update_price(product):
 
 
 if __name__ == '__main__':
-    print(get_price('https://www.netonnet.se/art/hem-fritid/personvard/harborttagning-rakning/nastrimmer/andersson-oron-och-nastrimmer-net-1-3/247047.9140/'))
+    pass

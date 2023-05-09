@@ -17,8 +17,10 @@ load_dotenv()
 
 @login_required(login_url='/login')
 def home(request: object):
+    # Get all products
     products = Product.objects.all()
 
+    # Get sort_by parameter
     sort_by = request.GET.get("sort_by", "date_added")
     if sort_by == "name":
         products = products.order_by("name")
@@ -27,25 +29,24 @@ def home(request: object):
     else:
         products = products.order_by("-date_added")
 
+    # Process POST request for deleting a product
     if request.method == 'POST':
         product_id = request.POST.get('product-id')
         product = Product.objects.filter(pk=product_id).first()
+
+        # Makes sure the product exists and the user is permitted to delete it
         if product and product.author == request.user:
             product.delete()
-        
-    for product in products:
-        update_price(product)
-
-        
 
     return render(request, 'main/index.html', {'products': products})
 
 def signup(request: object):
+    # Handles the registration of a new user
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            login(request, user) # Log the user in after registration
             return redirect('/index')
     
     else:
@@ -57,13 +58,13 @@ def signup(request: object):
 def create_product(request: object):
     if request.method == 'POST':
         form = ProductForm(request.POST)
-        if form.is_valid():
-            product = form.save(commit=False)
+        if form.is_valid(): # Make sure the form is valid
+            product = form.save(commit=False) # Create a new product object but don't save it to the database until price and author is set
             product.author = request.user
             try:
-                product.price = get_price(product.link)
+                product.price = get_price(product.link) # Get the price of the product
             except:
-                product.price = 0
+                product.price = 0 # If the price can't be found, set it to 0, on the page it will be displayed as "N/A"
             product = product.save()
             return redirect('/index')
     
@@ -77,14 +78,16 @@ def track_product(request: object, product_id: int):
     product = get_object_or_404(Product, pk=product_id)
     tracking_entry = ProductTracking.objects.filter(user=request.user, product=product)
 
-    if tracking_entry.exists():
+    if tracking_entry.exists(): # If the user is already tracking the product, delete the tracking entry
         tracking_entry.delete()
     else:
-        ProductTracking.objects.create(user=request.user, product=product)
+        ProductTracking.objects.create(user=request.user, product=product) # Otherwise, create a new tracking entry
 
     next_url = request.GET.get('next', None)
+
     if not next_url:
-        next_url = reverse('index')
+        next_url = reverse('index') #Returns the user to the previus page if there is one, otherwise the home page
+
     return redirect(next_url)
 
 @login_required(login_url='/login')
@@ -93,6 +96,7 @@ def user_profile(request: object, username: str):
     posted_products = Product.objects.filter(author=user)
     tracked_products = Product.objects.filter(producttracking__user=user)
 
+    # Database variables to pass to the template
     context = {
         'user_profile': user,
         'posted_products': posted_products,
@@ -105,17 +109,18 @@ def user_profile(request: object, username: str):
 def edit_product(request: object, product_id: int):
     product = get_object_or_404(Product, pk=product_id)
     
-    if request.user != product.author:
+    if request.user != product.author: # Make sure the user is the author of the product
         return HttpResponseRedirect(reverse('home'))
 
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, instance=product) # Initialize the form with the existing product data
         if form.is_valid():
-            form.save()
+            form.save() # Save the changes to the product
             return HttpResponseRedirect(reverse('user_profile', args=[request.user.username]))
     else:
         form = ProductForm(instance=product)
 
+    # Database variables to pass to the template
     context = {
         'form': form,
         'product': product,
@@ -126,11 +131,11 @@ def edit_product(request: object, product_id: int):
 @login_required(login_url='/login')
 def edit_profile(request: object):
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=request.user)
+        form = UserChangeForm(request.POST, instance=request.user) # Initialize the form with the existing user data
 
         if 'delete_account' in request.POST:
-            request.user.delete()
-            return HttpResponseRedirect(reverse('home'))
+            request.user.delete() # Delete the user account
+            return redirect('/index')
 
         if form.is_valid():
             form.save()
@@ -141,6 +146,7 @@ def edit_profile(request: object):
     
     password_change_form = PasswordChangeForm(request.user)
 
+    # Database variables to pass to the template
     context = {
         'form': form,
         'password_change_form': password_change_form,
@@ -154,19 +160,22 @@ def about(request: object):
 
 @login_required(login_url='/login')
 def contact(request):
+
     if request.method == 'POST':
         form = ContactForm(request.POST)
+
         if form.is_valid():
-            subject = form.cleaned_data['subject']
-            message = f"Message from {form.cleaned_data['name']}):\n\n{form.cleaned_data['message']}"
+            subject = form.cleaned_data['subject'] # Get the subject and message from the form
+            message = f"Message from {form.cleaned_data['name']}): {request.user.email}\n\n{form.cleaned_data['message']}"
+            
+            # Sends email to the admin email from the admin email
             send_mail(
                 subject, 
                 message, 
                 settings.EMAIL_HOST_USER, 
-                [request.user.email], 
+                [settings.EMAIL_HOST_USER], 
                 fail_silently=False
             )
-            print(request.user.email)
             return HttpResponseRedirect(reverse('contact_success'))
     else:
         form = ContactForm()
