@@ -25,20 +25,22 @@ def get_price(link: str):
         soup = BeautifulSoup(requests.get(link, headers=headers).text, 'html.parser')
         try:
             if link.startswith('https://www.netonnet.se'):
-                return price_to_float(soup.find('div', class_='price-big').text.strip().removesuffix(':-'))
+                return price_to_float(soup.find('div', class_='price-big').get_text(strip=True))
 
             elif link.startswith('https://www.mediamarkt.se/'):
-                return soup.find('div', class_='price small').text.strip()
+                return price_to_float(soup.find("div", class_="price big").get_text(strip=True) )
 
-            elif link('https://www.elgiganten.se/'):
-                return soup.find(class_="product-price-container").get_text()
+            elif link.startswith('https://www.inet.se/'):
+                try:
+                    return price_to_float(soup.find("span", class_="bp5wbcj c1funyia l1gqmknm").get_text(strip=True))
+                except:
+                    return price_to_float(soup.find("span", class_="bp5wbcj l1gqmknm").get_text(strip=True))
 
         except Exception as e:
             print(e)
             return 0
 
 def update_price(product):
-    print('Updating price...')
     if product.price != get_price(product.link):
         tracking_users = User.objects.filter(producttracking__product=product)
 

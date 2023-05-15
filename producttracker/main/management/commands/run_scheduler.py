@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for product in Product.objects.all():
-            schedule.every(10).minutes.do(update_price_wrapper(product))
+            schedule.every(30).minutes.do(update_price_wrapper(product))
 
         while True:
             schedule.run_pending()

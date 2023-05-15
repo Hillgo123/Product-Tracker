@@ -17,11 +17,19 @@ class SignUpForm(UserCreationForm):
 
 def validate_url(link: str):
     validator = URLValidator()
-    try:
-        validator(link)
+    valid_urls = [
+        'https://www.netonnet.se', 
+        'https://www.mediamarkt.se', 
+        'https://www.inet.se'
+        ]
+    
+    for i in valid_urls:
+        if link.startswith(i):
+            validator(link)
 
-    except ValidationError:
-        raise ValidationError('Invalid URL')
+        else:
+            raise ValidationError('Invalid URL; Current Valid URLs: https://www.netonnet.se \n https://www.mediamarkt.se \n https://www.inet.se')
+            
 
 class ProductForm(forms.ModelForm):
     link = forms.CharField(validators=[validate_url])
@@ -53,6 +61,7 @@ class PasswordChangeForm(SetPasswordForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Reorder fields from new_password1, new_password2, old_password to old_password, new_password1, new_password2
         self.fields = OrderedDict([
             ('old_password', self.fields['old_password']),
             ('new_password1', self.fields['new_password1']),

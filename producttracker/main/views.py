@@ -159,7 +159,7 @@ def about(request: object):
     return render(request, 'main/about.html')
 
 @login_required(login_url='/login')
-def contact(request):
+def contact(request: object):
 
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -182,5 +182,11 @@ def contact(request):
 
     return render(request, 'main/contact.html', {'form': form})
 
-def contact_success(request):
+def contact_success(request: object):
     return render(request, 'main/contact_success.html')
+
+def terms(request: object):
+    return render(request, 'required/terms.html')
+
+def privacy(request: object):
+    return render(request, 'required/privacy.html')
